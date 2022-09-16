@@ -1,4 +1,5 @@
 ﻿using Bitbucketwise.Models;
+using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -64,6 +65,29 @@ namespace Bitbucketwise
             return await getObjectAsync<Page<Repository>>(url);
         }
 
+        public async Task<Browse> GetRepositoryBrowseAsync(string projectKey, string repositorySlug, string path, bool noContent, string at, bool size, bool blame, bool type)
+        {
+            if (projectKey == null)
+            {
+                throw new NullReferenceException(nameof(projectKey));
+            }
+            if (repositorySlug == null)
+            {
+                throw new NullReferenceException(nameof(repositorySlug));
+            }
+
+            var query = string.Empty;
+            query += getQueryArg(nameof(noContent), noContent);
+            query += getQueryArg(nameof(at), at);
+            query += getQueryArg(nameof(size), size);
+            query += getQueryArg(nameof(blame), blame);
+            query += getQueryArg(nameof(type), type);
+
+            var url = $"{baseUrl}/projects/{projectKey}/repos/{repositorySlug}/browse/{path}?{query}";
+
+            return await getObjectAsync<Browse>(url);
+        }
+
         private async Task<T> getObjectAsync<T>(string url)
         {
             using (var http = new HttpClient())
@@ -71,6 +95,10 @@ namespace Bitbucketwise
                 http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_username}:{_password}")));
                 http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
+#if DEBUG
+                var response = await http.GetAsync(url);
+                var responseString = await response.Content.ReadAsStringAsync();
+#endif
                 return await http.GetFromJsonAsync<T>(url);
             }
         }
