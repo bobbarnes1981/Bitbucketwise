@@ -65,7 +65,7 @@ namespace Bitbucketwise
             return await getObjectAsync<Page<Repository>>(url);
         }
 
-        public async Task<Browse> GetRepositoryBrowseAsync(string projectKey, string repositorySlug, string path, bool noContent, string at, bool size, bool blame, bool type)
+        public async Task<Browse> GetRepositoryBrowseAsync(string projectKey, string repositorySlug, string path, string at, bool noContent = false, bool size = false, bool blame = false, bool type = false)
         {
             if (projectKey == null)
             {
