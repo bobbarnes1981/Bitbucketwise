@@ -17,6 +17,14 @@ namespace Bitbucketwise
         private string _apiName = "api";
         private string _apiVersion = "latest";
 
+        private string baseUrl
+        {
+            get
+            {
+                return $"{_protocol}://{_host}:{_port}/rest/{_apiName}/{_apiVersion}";
+            }
+        }
+
         public BitbucketClient(string protocol, string host, int port, string username, string password)
         {
             _protocol = protocol;
@@ -35,7 +43,7 @@ namespace Bitbucketwise
             query += getQueryArg(nameof(start), start);
             query += getQueryArg(nameof(limit), limit);
 
-            var url = $"{_protocol}://{_host}:{_port}/rest/{_apiName}/{_apiVersion}/projects?{query}";
+            var url = $"{baseUrl}/projects?{query}";
 
             return await getObjectAsync<Page<Project>>(url);
         }
@@ -51,7 +59,7 @@ namespace Bitbucketwise
             query += getQueryArg(nameof(start), start);
             query += getQueryArg(nameof(limit), limit);
 
-            var url = $"http://{_host}:{_port}/rest/{_apiName}/{_apiVersion}/projects/{projectKey}/repos?{query}";
+            var url = $"{baseUrl}/projects/{projectKey}/repos?{query}";
 
             return await getObjectAsync<Page<Repository>>(url);
         }
