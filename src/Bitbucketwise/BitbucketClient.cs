@@ -65,7 +65,17 @@ namespace Bitbucketwise
             return await getObjectAsync<Page<Repository>>(url);
         }
 
-        public async Task<Browse> GetRepositoryBrowseAsync(string projectKey, string repositorySlug, string path, string at, bool noContent = false, bool size = false, bool blame = false, bool type = false)
+        public async Task<RemoteBrowse> GetRepositoryBrowseAsync(string projectKey, string repositorySlug, string path, string at, bool noContent = false, bool size = false, bool blame = false, bool type = false)
+        {
+            return await getRepositoryBrowseInternalAsync<RemoteBrowse>(projectKey, repositorySlug, path, at, noContent, size, blame, type);
+        }
+
+        public async Task<RemoteFile> GetRepositoryFileAsync(string projectKey, string repositorySlug, string path, string at, bool noContent = false, bool size = false, bool blame = false, bool type = false)
+        {
+            return await getRepositoryBrowseInternalAsync<RemoteFile>(projectKey, repositorySlug, path, at, noContent, size, blame, type);
+        }
+
+        private async Task<T> getRepositoryBrowseInternalAsync<T>(string projectKey, string repositorySlug, string path, string at, bool noContent = false, bool size = false, bool blame = false, bool type = false)
         {
             if (projectKey == null)
             {
@@ -85,7 +95,7 @@ namespace Bitbucketwise
 
             var url = $"{baseUrl}/projects/{projectKey}/repos/{repositorySlug}/browse/{path}?{query}";
 
-            return await getObjectAsync<Browse>(url);
+            return await getObjectAsync<T>(url);
         }
 
         private async Task<T> getObjectAsync<T>(string url)
@@ -95,10 +105,9 @@ namespace Bitbucketwise
                 http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_username}:{_password}")));
                 http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-#if DEBUG
-                var response = await http.GetAsync(url);
-                var responseString = await response.Content.ReadAsStringAsync();
-#endif
+//                var response = await http.GetAsync(url);
+//                var responseString = await response.Content.ReadAsStringAsync();
+
                 return await http.GetFromJsonAsync<T>(url);
             }
         }

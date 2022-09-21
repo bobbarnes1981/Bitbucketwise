@@ -1,6 +1,6 @@
 ﻿namespace Bitbucketwise.Models
 {
-    public class Browse
+    public class RemoteBrowse
     {
         public Path Path { get; set; }
         public string Revision { get; set; }
